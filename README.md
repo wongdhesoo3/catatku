@@ -57,4 +57,6 @@ lalu buka `http://localhost:8000` (sesuaikan port) di browser.
 
 ## URL Publik
 
-MENUNGGU DEPLOY
+https://wongdhesoo3.github.io/catatku/
+
+Terbit lewat GitHub Pages (branch `gh-pages`).
