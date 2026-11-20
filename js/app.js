@@ -43,6 +43,8 @@ function pasangTombolHapus() {
   });
 }
 
+const JUDUL_MIN = 3;
+
 function pasangForm(catatanEdit) {
   const form = document.querySelector("#form-catatan");
   if (!form) return;
@@ -59,8 +61,8 @@ function pasangForm(catatanEdit) {
     }
 
     // Validasi tambahan: judul terlalu pendek sulit dicari lagi nanti
-    if (judul.length < 3) {
-      app.innerHTML = viewForm({ judul, isi }, "Judul minimal 3 karakter.", Boolean(catatanEdit));
+    if (judul.length < JUDUL_MIN) {
+      app.innerHTML = viewForm({ judul, isi }, `Judul minimal ${JUDUL_MIN} karakter.`, Boolean(catatanEdit));
       pasangForm(catatanEdit);
       return;
     }
