@@ -58,6 +58,13 @@ function pasangForm(catatanEdit) {
       return;
     }
 
+    // Validasi tambahan: judul terlalu pendek sulit dicari lagi nanti
+    if (judul.length < 3) {
+      app.innerHTML = viewForm({ judul, isi }, "Judul minimal 3 karakter.", Boolean(catatanEdit));
+      pasangForm(catatanEdit);
+      return;
+    }
+
     if (catatanEdit) {
       catatan = catatan.map((c) => (c.id === catatanEdit.id ? { ...c, judul, isi } : c));
       pesanFlash = "Perubahan berhasil disimpan.";
