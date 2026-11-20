@@ -1,5 +1,8 @@
 # CatatKu
 
+![CI CatatKu](https://github.com/wongdhesoo3/catatku/actions/workflows/ci.yml/badge.svg)
+
+
 Aplikasi catatan sederhana berbasis web statis murni (HTML/CSS/JavaScript vanilla, tanpa build step).
 Data tersimpan di `localStorage` browser, routing memakai hash (`#/`, `#/baru`, `#/catatan/:id`, `#/edit/:id`)
 sehingga tetap bekerja saat dibuka sebagai file statis maupun setelah deploy.
@@ -59,4 +62,11 @@ lalu buka `http://localhost:8000` (sesuaikan port) di browser.
 
 https://wongdhesoo3.github.io/catatku/
 
-Terbit lewat GitHub Pages (branch `gh-pages`).
+Terbit lewat GitHub Pages, di-deploy otomatis oleh GitHub Actions setiap ada push ke `main`.
+
+## CI/CD
+
+Setiap push dan pull request ke `main` menjalankan pipeline GitHub Actions
+(`.github/workflows/ci.yml`): `npm ci`, lint (`node --check`), test perilaku
+dengan jsdom, dan build ke `dist/`. Push ke `main` yang lolos test langsung
+di-deploy ke GitHub Pages.
