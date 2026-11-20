@@ -43,6 +43,8 @@ function pasangTombolHapus() {
   });
 }
 
+const JUDUL_MIN = 3;
+
 function pasangForm(catatanEdit) {
   const form = document.querySelector("#form-catatan");
   if (!form) return;
@@ -54,6 +56,13 @@ function pasangForm(catatanEdit) {
     // Validasi: judul kosong ditolak dengan pesan jelas, bukan jadi catatan hantu
     if (!judul) {
       app.innerHTML = viewForm({ judul, isi }, "Judul tidak boleh kosong.", Boolean(catatanEdit));
+      pasangForm(catatanEdit);
+      return;
+    }
+
+    // Validasi tambahan: judul terlalu pendek sulit dicari lagi nanti
+    if (judul.length < JUDUL_MIN) {
+      app.innerHTML = viewForm({ judul, isi }, `Judul minimal ${JUDUL_MIN} karakter.`, Boolean(catatanEdit));
       pasangForm(catatanEdit);
       return;
     }
