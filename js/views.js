@@ -12,7 +12,7 @@ function escapeHtml(teks) {
 // Bagian daftar catatan saja (dipakai ulang saat pencarian berubah)
 function viewDaftarList(catatan, q) {
   if (!catatan.length) {
-    return `<p class="kosong">Daftar kosong total.</p>`;
+    return `<p class="kosong">Belum ada catatan. Buat yang pertama, yuk!</p>`;
   }
   const hasil = catatan.filter((c) =>
     (c.judul + " " + c.isi).toLowerCase().includes(q.toLowerCase())
