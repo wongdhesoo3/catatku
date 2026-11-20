@@ -1,61 +1,111 @@
 # CatatKu — Catatan Sederhana
 
-## Masalah
-
-Catatan harian — ide, daftar tugas kecil, hal yang harus diingat — sering ditulis sembarangan: di kertas yang hilang, di chat ke diri sendiri yang tenggelam, atau di aplikasi berat yang harus daftar dan login dulu. Akibatnya catatan berantakan dan susah dicari lagi saat dibutuhkan.
-
-## Solusi
-
-CatatKu adalah aplikasi catatan berbasis web yang ringan dan langsung bisa dipakai tanpa akun: buka halaman, tulis catatan, selesai. Tidak ada server, tidak ada pendaftaran — data disimpan di browser kamu sendiri.
+CatatKu adalah aplikasi catatan berbasis web yang ringan: tulis, cari, dan kelola catatan harian langsung dari browser, tanpa akun dan tanpa server.
 
 **Demo live:** https://wongdhesoo3.github.io/catatku/
+**Stack:** HTML · CSS · JavaScript vanilla (tanpa framework, tanpa build step) · localStorage · GitHub Actions untuk CI/CD
+
+[![CI CatatKu](https://github.com/wongdhesoo3/catatku/actions/workflows/ci.yml/badge.svg)](https://github.com/wongdhesoo3/catatku/actions/workflows/ci.yml)
 
 ## Fitur Utama
 
-- **CRUD catatan lengkap** — tambah, lihat detail, edit, dan hapus (dengan dialog konfirmasi).
-- **Validasi judul** — judul kosong atau terlalu pendek ditolak dengan pesan yang jelas.
-- **Pencarian langsung** — berdasarkan judul dan isi catatan, hasil menyaring saat mengetik.
-- **Persistensi localStorage** — catatan tetap ada setelah halaman di-refresh; data yang korup ditangani aman (dianggap kosong, aplikasi tidak mogok).
-- **Halaman detail per catatan** — lewat routing hash (`#/catatan/:id`), tetap bekerja sebagai situs statis.
-- **Umpan balik status** — pesan konfirmasi muncul setelah simpan/hapus.
-- **Responsif** — nyaman di layar HP selebar 360px, semua tombol berukuran sentuh minimal 44px.
+- **Catatan lengkap dalam hitungan detik** — tambah, lihat detail, edit, dan hapus (dengan konfirmasi) lewat halaman daftar, detail (`#/catatan/:id`), dan form (`#/baru`, `#/edit/:id`).
+- **Judul tidak pernah kosong atau terlalu pendek** — form menolak judul kosong dan judul di bawah 3 karakter dengan pesan error yang jelas, bukan catatan hantu.
+- **Temukan catatan cukup dengan mengetik** — pencarian langsung menyaring daftar berdasarkan judul dan isi saat kamu mengetik.
+- **Catatan tetap ada setelah browser ditutup** — semua data tersimpan otomatis di `localStorage`; data yang rusak/korup ditangani aman (dianggap kosong, aplikasi tidak mogok).
+- **Nyaman dibuka dari HP** — tampilan responsif yang tetap rapi di layar 360px dengan tombol sentuh minimal 44px, plus pesan status setelah simpan/hapus.
 
-## Menjalankan Lokal
+## Quick Start
 
-Aplikasi ini statis murni — tidak ada build step dan tidak ada dependensi runtime.
+Prasyarat: [Node.js](https://nodejs.org) versi 20 atau lebih baru dan npm (hanya untuk lint, test, dan build — aplikasinya sendiri murni statis).
 
-Cara paling sederhana: buka file `index.html` langsung di browser.
+1. Ambil kode sumber:
 
-Atau jalankan server statis dari folder proyek:
+   ```bash
+   git clone https://github.com/wongdhesoo3/catatku.git
+   cd catatku
+   ```
+
+2. Pasang dependensi pengembangan (jsdom untuk test):
+
+   ```bash
+   npm ci
+   ```
+
+   Hasil yang diharapkan: instalasi selesai tanpa error dan folder `node_modules/` terbentuk.
+
+3. Periksa sintaks semua file JavaScript:
+
+   ```bash
+   npm run lint
+   ```
+
+   Hasil yang diharapkan: perintah selesai tanpa output error (ketiga file `js/` lolos `node --check`).
+
+4. Jalankan test perilaku aplikasi:
+
+   ```bash
+   npm test
+   ```
+
+   Hasil yang diharapkan: 10 pemeriksaan berstatus `LOLOS` dan baris terakhir berbunyi `SEMUA UJI LULUS`.
+
+5. Jalankan aplikasinya — buka `index.html` langsung di browser, atau pakai server statis lokal:
+
+   ```bash
+   npx serve .
+   ```
+
+   lalu buka alamat yang ditampilkan (biasanya `http://localhost:3000`). Hasil yang diharapkan: halaman CatatKu terbuka dengan pesan "Belum ada catatan. Buat yang pertama, yuk!".
+
+## Contoh Penggunaan
+
+- **Input:** klik **+ Catatan Baru**, isi judul `Belanja Mingguan` dan isi `Susu, telur, kopi`, lalu klik **Simpan Catatan**.
+  **Output:** muncul pesan "Catatan berhasil disimpan.", catatan tampil sebagai kartu di daftar, dan tetap ada setelah halaman di-refresh.
+- **Input:** ketik `belanja` di kolom pencarian.
+  **Output:** daftar langsung menyaring dan hanya menampilkan catatan yang judul/isinya mengandung kata itu.
+- **Input:** buka `https://wongdhesoo3.github.io/catatku/#/catatan/1` (atau klik judul catatan).
+  **Output:** halaman detail catatan tersebut terbuka, lengkap dengan tombol Edit dan Hapus.
+
+## Arsitektur Singkat
+
+Satu halaman `index.html` memuat tiga skrip klasik berurutan: `js/storage.js` (baca/tulis `localStorage`), `js/views.js` (fungsi template HTML), dan `js/app.js` (routing hash + satu state bersama + wiring event). Setiap perubahan state disimpan ke `localStorage` lalu halaman di-render ulang dari state tersebut. Penjelasan lengkap ada di [docs/architecture.md](docs/architecture.md).
+
+## Menjalankan Test
 
 ```bash
-npx serve .
-# atau
-python3 -m http.server 8000
+npm ci
+npm run lint   # node --check untuk js/app.js, js/storage.js, js/views.js
+npm test       # 5 skenario jsdom: kosong -> tambah -> edit + refresh -> hapus -> cek CSS
+npm run build  # menyalin file statis ke dist/ (dipakai untuk deploy)
 ```
 
-lalu buka `http://localhost:8000` di browser.
+Output `npm test` yang diharapkan: 10 baris pemeriksaan `LOLOS` (skenario 1, 2a, 2b, 3a, 3b, 4a, 4b, 4c, 5a, 5b) dan ditutup `SEMUA UJI LULUS`. Pipeline yang sama berjalan otomatis di GitHub Actions pada setiap push dan pull request ke `main`; push ke `main` yang lolos CI otomatis men-deploy `dist/` ke GitHub Pages.
 
-Menjalankan test dan pemeriksaan kode (memakai Node.js, sesuai pipeline CI):
+## Keterbatasan & Roadmap
 
-```bash
-npm ci      # memasang jsdom untuk test
-npm run lint
-npm test    # test perilaku aplikasi dengan jsdom (node test/app.test.mjs)
-npm run build
-```
+Keterbatasan saat ini (jujur, apa adanya):
 
-## Keputusan Teknis
+- Data hanya tersimpan di `localStorage` satu browser (kunci `catatku`, batas wajar sekitar 5 MB): ganti browser/perangkat atau membersihkan data situs akan menghapus catatan.
+- Belum ada akun pengguna, sinkronisasi antarperangkat, maupun berbagi catatan — ketiganya membutuhkan backend.
+- Routing memakai hash (`#/...`), jadi tidak ada URL path asli per catatan dan tidak ada rendering di sisi server.
 
-- **Vanilla JavaScript tanpa framework.** Aplikasi sekecil ini tidak butuh React/Vue; tanpa framework berarti tanpa build step, muat instan, dan kode mudah diaudit. Trade-off: routing dan rendering ditulis manual (hash routing + render fungsi), yang masih terkendali di skala ini tapi akan terasa berat bila fitur tumbuh besar.
-- **localStorage untuk persistensi.** Data langsung tersimpan di browser tanpa backend, sehingga aplikasi bekerja offline dan gratis di-hosting statis. Trade-off: data terikat pada satu browser/perangkat — belum ada sinkronisasi antarperangkat dan tidak ada akun pengguna.
-- **GitHub Actions untuk CI + deploy.** Setiap push/PR ke `main` menjalankan lint, test, dan build; push ke `main` otomatis men-deploy ke GitHub Pages. Trade-off: pipeline bergantung pada ekosistem GitHub, tapi sebagai gantinya tidak ada server deploy yang perlu dirawat.
+Roadmap:
 
-## Keterbatasan
+- [ ] Ekspor/impor catatan sebagai file JSON.
+- [ ] Backend + akun pengguna untuk sinkronisasi antarperangkat.
+- [ ] Berbagi catatan lewat tautan.
 
-- Data hanya tersimpan di browser lokal (localStorage) — ganti browser atau bersihkan data situs berarti catatan hilang.
-- Belum ada akun pengguna, sinkronisasi cloud, maupun berbagi catatan; fitur-fitur itu membutuhkan backend dan direncanakan untuk versi berikutnya.
-- Satu perangkat, satu daftar catatan: belum ada kategori/label dan belum ada ekspor/impor.
+## Berkontribusi & Riwayat Rilis
+
+- Cara setup lingkungan dev, aturan branch, format commit, dan aturan pull request: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Riwayat perubahan per versi: [CHANGELOG.md](CHANGELOG.md)
+
+## Troubleshooting
+
+- **`npm ci` gagal atau `jsdom` tidak ditemukan saat `npm test`** — pastikan Node.js versi 20+ (`node --version`), lalu hapus folder `node_modules` dan jalankan `npm ci` ulang dari folder proyek.
+- **Port sudah dipakai saat menjalankan server statis** (mis. `EADDRINUSE` atau halaman yang terbuka bukan CatatKu) — ganti port, contoh: `npx serve -l 3001 .` atau `python3 -m http.server 8001`, lalu buka alamat dengan port baru itu.
+- **Catatan "hilang" padahal tidak dihapus** — data terikat pada origin (protokol + host + port) yang sama: catatan yang dibuat saat membuka `index.html` sebagai file (`file://`) tidak terbaca saat membuka lewat `http://localhost:3000`, dan sebaliknya. Buka aplikasi lewat alamat yang sama seperti saat membuat catatan.
 
 ## Lisensi
 
